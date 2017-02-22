@@ -29,7 +29,7 @@ async def on_message(message):
 def main():
     token = os.getenv('LITHIUM_TOKEN')
     if not token:
-        token = input("Provide API Token").strip()
+        token = input("Provide API Token: ").strip()
     client.run(token)
 
 if __name__ == "__main__":
