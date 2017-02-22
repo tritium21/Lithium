@@ -27,7 +27,9 @@ async def on_message(message):
             await client.send_message(message.channel, line)
 
 def main():
-    token = os.getenv('LITHIUM_TOKEN', input("Provide API Token").strip())
+    token = os.getenv('LITHIUM_TOKEN')
+    if not token:
+        token = input("Provide API Token").strip()
     client.run(token)
 
 if __name__ == "__main__":
