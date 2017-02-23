@@ -5,15 +5,13 @@ import os
 import diceparse
 import discord
 
-baselog = logging.getLogger('discord')
-baselog.setLevel(logging.INFO)
-logger = baselog.getChild('lithium')
+logging.basicConfig(level=logging.INFO)
 
 client = discord.Client()
 
 @client.event
 async def on_ready():
-    logger.info(
+    logging.info(
         "Logged in as %s, %s",
         client.user.name,
         client.user.id
