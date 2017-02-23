@@ -6,7 +6,7 @@ import diceparse
 import discord
 
 baselog = logging.getLogger('discord')
-baselog.basicConfig(level=logging.INFO)
+baselog.setLevel(logging.INFO)
 logger = baselog.getChild('lithium')
 
 client = discord.Client()
