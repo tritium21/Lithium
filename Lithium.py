@@ -32,7 +32,7 @@ class DiscordEOTE(diceparse.EOTE):
 
     def __str__(self):
         def key(c):
-            return list("pabdcs").index(c)
+            return list("fpabcds").index(c)
 
         instr = self._match.string.lower()
         instr = ''.join(self._discord_map[c] for c in sorted(instr, key=key))
