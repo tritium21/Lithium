@@ -62,7 +62,7 @@ class DiscordEOTE(diceparse.EOTE):
             "threat": "<:threat:300757237432057856>",
             "success": "<:success:300756067606855682>",
             "light": "<:lightside:300757237427732480>",
-            "dark": "<:darkside:300757237327069195>)",
+            "dark": "<:darkside:300757237327069195>",
             "failure": "<:failure:300757237175943172>",
             "advantage": "<:advantage:300755580199370752>",
             "dispair": "<:despair:300757238140764161>",
