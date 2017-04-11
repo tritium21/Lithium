@@ -1,9 +1,59 @@
 import asyncio
 import logging
 import os
+import re
 
 import diceparse
 import discord
+
+
+class Destiny:
+    def __init__(self, light=None, dark=None):
+        self.reset()
+        self.set(light, dark)
+
+    def parse(self, instr):
+        instr = instr.strip().lower()
+        match = re.match(r"(?=.*?([0-9]+)l)?(?=.*?([0-9]+)d)?[0-9dl]+", instr)
+        if instr in {"l", "light"}:
+            self.flip(True)
+        elif instr in {"d", "dark"}:
+            self.flip(False)
+        elif instr == "reset":
+            self.reset()
+        elif match:
+            self.set(*match.groups())
+        return str(self) or None
+
+    def set(self, light=None, dark=None):
+        self.light = int(light) if light is not None else self.light
+        self.dark = int(dark) if dark is not None else self.dark
+        return self
+
+    def reset(self):
+        self.set(0, 0)
+        return self
+
+    def flip(self, light=True):
+        if light and self.light >= 1:
+            self.light -= 1
+            self.dark += 1
+        elif not light and self.dark >= 1:
+            self.light += 1
+            self.dark -= 1
+        return self
+
+    def __repr__(self):
+        return "{}(light={}, dark={})".format(
+            self.__class__.__name__,
+            self.light,
+            self.dark
+        )
+
+    def __str__(self):
+        ds = "<:darkside:300757237327069195>"
+        ls = "<:lightside:300757237427732480>"
+        return (ls * self.light) + (ds * self.dark)
 
 
 class DiscordEOTE(diceparse.EOTE):
@@ -12,7 +62,7 @@ class DiscordEOTE(diceparse.EOTE):
             "threat": "<:threat:300757237432057856>",
             "success": "<:success:300756067606855682>",
             "light": "<:lightside:300757237427732480>",
-            "dark": "<:darkside:300757237327069195>",
+            "dark": "<:darkside:300757237327069195>)",
             "failure": "<:failure:300757237175943172>",
             "advantage": "<:advantage:300755580199370752>",
             "dispair": "<:despair:300757238140764161>",
@@ -32,7 +82,7 @@ class DiscordEOTE(diceparse.EOTE):
 
     def __str__(self):
         def key(c):
-            return list("fpabcds").index(c)
+            return "fpabcds".index(c)
 
         instr = self._match.string.lower()
         instr = ''.join(self._discord_map[c] for c in sorted(instr, key=key))
@@ -43,7 +93,7 @@ class DiscordEOTE(diceparse.EOTE):
 roll = diceparse.Roller([diceparse.Standard, diceparse.UniFate, DiscordEOTE])
 
 logging.basicConfig(level=logging.INFO)
-
+destiny = Destiny()
 client = discord.Client()
 
 @client.event
@@ -62,6 +112,13 @@ async def on_message(message):
         lines = roll(rest, who=nick).split("\n")
         for line in lines:
             await client.send_message(message.channel, line)
+    elif message.content.startswith("!destiny"):
+        _, _, rest = message.content.partition(" ")
+        line = destiny.parse(rest)
+        if line:
+            await client.send_message(message.channel, "Destiny: " + line)
+        else:
+            await client.send_message(message.channel, "No Destiny set.")
 
 def main():
     token = os.getenv('LITHIUM_TOKEN')
